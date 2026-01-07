@@ -38,4 +38,8 @@ UGameInput::UGameInput()
 	static ConstructorHelpers::FObjectFinder<UInputAction> Skill_RMB(TEXT("/Script/EnhancedInput.InputAction'/Game/Blueprints/Input/IA_Skill_RMB.IA_Skill_RMB'"));
 	if (Skill_RMB.Succeeded())
 		mSkill_RMB = Skill_RMB.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> TESTKey(TEXT("/Script/EnhancedInput.InputAction'/Game/Blueprints/Input/IA_Test.IA_Test'"));
+	if (TESTKey.Succeeded())
+		mTest = TESTKey.Object;
 }

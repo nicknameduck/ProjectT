@@ -89,6 +89,9 @@ public:
 
 	UFUNCTION()
 	void Skill_RMBReleased(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void TestKey(const FInputActionValue& Value);
 		
 public:
 	void OnHPChanged(const FOnAttributeChangeData& Data);

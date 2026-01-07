@@ -18,12 +18,22 @@ public:
 	UGameInput();
 
 public:
+	UPROPERTY()
 	TObjectPtr<UInputMappingContext>	mContext;
+	UPROPERTY()
 	TObjectPtr<UInputAction>			mMove;
+	UPROPERTY()
 	TObjectPtr<UInputAction>			mRotation;
+	UPROPERTY()
 	TObjectPtr<UInputAction>			mAttack;
+	UPROPERTY()
 	TObjectPtr<UInputAction>			mSkill_Q;
+	UPROPERTY()
 	TObjectPtr<UInputAction>			mSkill_R;
+	UPROPERTY()
 	TObjectPtr<UInputAction>			mSkill_E;
+	UPROPERTY()
 	TObjectPtr<UInputAction>			mSkill_RMB;
+	UPROPERTY()
+	TObjectPtr<UInputAction>			mTest;
 };

@@ -5,6 +5,7 @@
 
 #include "UIManager.h"
 #include "UEAssetManager.h"
+#include "PTGameInstance.h"
 
 #include "Monster.h"
 #include "Input.h"
@@ -32,7 +33,6 @@
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "Kismet/GameplayStatics.h"
-
 #include "KismetAnimationLibrary.h"
 
 // Sets default values
@@ -175,31 +175,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 	if (!PlayerController) 
 		return;
 
-	FVector WorldOrigin, WorldDirection;
-	if (PlayerController->DeprojectMousePositionToWorld(WorldOrigin, WorldDirection))
-	{
-		// 월드에서 평면(Z=캐릭터 위치)에 맞게 재계산
-		FVector PlayerPos = GetActorLocation();
-		float ZPlane = PlayerPos.Z;
-
-		float T = (ZPlane - WorldOrigin.Z) / WorldDirection.Z;
-		FVector AimTarget = WorldOrigin + WorldDirection * T;
-
-		FVector ToTarget = AimTarget - PlayerPos;
-		FVector Dir = PlayerController->GetControlRotation().Vector();
-
-		DrawDebugDirectionalArrow(
-			GetWorld(),
-			GetActorLocation(),
-			GetActorLocation() + ToTarget.GetSafeNormal() * 200.f,
-			120.f,
-			FColor::Blue,
-			false,
-			-1.f,
-			0,
-			5.f
-		);
-	}
 
 	FVector CameraTargetLoc = GetActorLocation();
 	//mSpringArm->SetRelativeLocation(CameraTargetLocation);
@@ -207,17 +182,51 @@ void APlayerCharacter::Tick(float DeltaTime)
 	FVector NewPos = FMath::VInterpTo(CurrentLoc, CameraTargetLoc, DeltaTime, 8.0f);
 	mSpringArm->SetWorldLocation(NewPos);
 
-	DrawDebugDirectionalArrow(
-		GetWorld(),
-		GetActorLocation(),
-		GetActorLocation() + GetActorForwardVector() * 200.f,
-		120.f,                // 화살표 크기
-		FColor::Green,
-		false,
-		-1.f,
-		0,
-		3.f                  // 두께
-	);
+	UPTGameInstance* PTGameInst = Cast<UPTGameInstance>(GetWorld()->GetGameInstance());
+	if (PTGameInst)
+	{
+		if (PTGameInst->mShowDrawDebug)
+		{
+			FVector WorldOrigin, WorldDirection;
+			if (PlayerController->DeprojectMousePositionToWorld(WorldOrigin, WorldDirection))
+			{
+				// 월드에서 평면(Z=캐릭터 위치)에 맞게 재계산
+				FVector PlayerPos = GetActorLocation();
+				float ZPlane = PlayerPos.Z;
+
+				float T = (ZPlane - WorldOrigin.Z) / WorldDirection.Z;
+				FVector AimTarget = WorldOrigin + WorldDirection * T;
+
+				FVector ToTarget = AimTarget - PlayerPos;
+				FVector Dir = PlayerController->GetControlRotation().Vector();
+
+				DrawDebugDirectionalArrow(
+					GetWorld(),
+					GetActorLocation(),
+					GetActorLocation() + ToTarget.GetSafeNormal() * 200.f,
+					120.f,
+					FColor::Blue,
+					false,
+					-1.f,
+					0,
+					5.f
+				);
+			}
+
+			DrawDebugDirectionalArrow(
+				GetWorld(),
+				GetActorLocation(),
+				GetActorLocation() + GetActorForwardVector() * 200.f,
+				120.f,                // 화살표 크기
+				FColor::Green,
+				false,
+				-1.f,
+				0,
+				3.f                  // 두께
+			);
+		}
+	}
+
 
 	if (mHealthBarWidget)
 	{
@@ -263,6 +272,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		InputCompo->BindAction(InputCDO->mSkill_RMB, ETriggerEvent::Started, this, &APlayerCharacter::Skill_RMBKey);
 		InputCompo->BindAction(InputCDO->mSkill_RMB, ETriggerEvent::Completed, this, &APlayerCharacter::Skill_RMBReleased);
+
+		InputCompo->BindAction(InputCDO->mTest, ETriggerEvent::Started, this, &APlayerCharacter::TestKey);
 	}
 }
 
@@ -372,6 +383,17 @@ void APlayerCharacter::Skill_RMBKey(const FInputActionValue& Value)
 void APlayerCharacter::Skill_RMBReleased(const FInputActionValue& Value)
 {
 	HandleSkillInputReleased(ESkillSlot::RMB);
+}
+
+void APlayerCharacter::TestKey(const FInputActionValue& Value)
+{
+	UPTGameInstance* PTGameInst = Cast<UPTGameInstance>(GetWorld()->GetGameInstance());
+	if (PTGameInst)
+	{
+		UE_LOG(ProjectTLog, Warning, TEXT("TESTKey"));
+		PTGameInst->mShowDrawDebug = !PTGameInst->mShowDrawDebug;
+	}
+	//mShowDrawDebug
 }
 
 void APlayerCharacter::OnHPChanged(const FOnAttributeChangeData& Data)
