@@ -364,8 +364,17 @@ void AMonster::PlaySpawnEffect()
 			true
 		);
 
-		const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 3.f);
-		const FRotator SpawnRotation = GetActorRotation();
+		UCapsuleComponent* Capsule = GetCapsuleComponent();
+		FVector FeetLocation;
+
+		if (Capsule)
+		{
+			const float CapsuleHalfHeight = Capsule->GetUnscaledCapsuleHalfHeight();
+			FeetLocation = GetActorLocation() - FVector(0, 0, CapsuleHalfHeight);
+		}
+
+		const FVector SpawnLocation = FeetLocation + FVector(0.f, 0.f, 3.f);
+		FRotator SpawnRotation = GetActorRotation();
 
 		if (mSpawnNiagara)
 		{

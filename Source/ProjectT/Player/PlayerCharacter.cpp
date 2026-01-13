@@ -322,7 +322,7 @@ void APlayerCharacter::AttackKey(const FInputActionValue& Value)
 
 		FHitResult Hit;
 		APlayerController* PlayerController = Cast<APlayerController>(GetController());
-		if (PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, Hit))
+		if (PlayerController->GetHitResultUnderCursor(ECC_GameTraceChannel10, true, Hit))
 			Payload.TargetData = FGameplayAbilityTargetDataHandle(new FGameplayAbilityTargetData_SingleTargetHit(Hit));
 		
 		ASC->HandleGameplayEvent(ConfirmTag, &Payload);
